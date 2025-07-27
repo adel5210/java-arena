@@ -10,7 +10,7 @@ public class ArenaMain {
         int numLongs = 100;
         final long totalBytes = longSizeInBytes * numLongs;
 
-        try (final Arena arena = Arena.ofAuto()) {
+        try (final Arena arena = Arena.ofConfined()) {
             System.out.println("Allocate MS of " + totalBytes + " bytes off-heap");
             final MemorySegment longArrayMS = arena.allocate(totalBytes);
             System.out.println("Memory segment allocated: " + longArrayMS);
@@ -30,6 +30,8 @@ public class ArenaMain {
 
             System.out.println("Closing arena and deallocate MS ...");
 
+        } catch (final Exception e) {
+            System.out.println("Error caught: " + e.getMessage());
         }
 
     }
