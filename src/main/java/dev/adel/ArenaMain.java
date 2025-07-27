@@ -1,17 +1,35 @@
 package dev.adel;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+
 public class ArenaMain {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        final long longSizeInBytes = ValueLayout.JAVA_LONG.byteSize();
+        int numLongs = 100;
+        final long totalBytes = longSizeInBytes * numLongs;
+        try (final Arena arena = Arena.ofAuto()) {
+            System.out.println("Allocate MS of " + totalBytes + " bytes off-heap");
+            final MemorySegment longArrayMS = arena.allocate(totalBytes);
+            System.out.println("Memory segment allocated: " + longArrayMS);
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+            System.out.println("Writing long values to MS...");
+            for (int i = 0; i < numLongs; i++) {
+                final long val = (i + 1) * 100L;
+                longArrayMS.setAtIndex(ValueLayout.JAVA_LONG, i, val);
+                System.out.println("Value: " + val + " at index " + i);
+            }
+
+            System.out.println("Accessing MS directly as long array ...");
+            for (int i = 0; i < numLongs; i++) {
+                final long val = longArrayMS.getAtIndex(ValueLayout.JAVA_LONG, i);
+                System.out.println("MS Value: " + val + " at index " + i);
+            }
+
+            System.out.println("Closing arena and deallocate MS ...");
+
         }
+
     }
 }
