@@ -9,6 +9,7 @@ public class ArenaMain {
         final long longSizeInBytes = ValueLayout.JAVA_LONG.byteSize();
         int numLongs = 100;
         final long totalBytes = longSizeInBytes * numLongs;
+
         try (final Arena arena = Arena.ofAuto()) {
             System.out.println("Allocate MS of " + totalBytes + " bytes off-heap");
             final MemorySegment longArrayMS = arena.allocate(totalBytes);
